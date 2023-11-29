@@ -1,0 +1,285 @@
+%%
+%% This is file `sample-sigconf.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `sigconf')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigconf.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%%
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
+%%
+%% For submission and review of your manuscript please change the
+%% command to \documentclass[manuscript, screen, review]{acmart}.
+%%
+%% When submitting camera ready or to TAPS, please change the command
+%% to \documentclass[sigconf]{acmart} or whichever template is required
+%% for your publication.
+%%
+\documentclass[sigplan,review,anonymous,9pt]{acmart}
+\acmSubmissionID{1331}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+% Optional: Remove the ACM reference between the abstract and the main text.
+\settopmatter{printfolios=true,printacmref=false}
+% Optional: Comment out the CCS concepts and keywords.
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2023}
+\acmYear{2023}
+\acmDOI{XXXXXXX.XXXXXXX}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[DAC 2024]{Make sure to enter the correct
+  conference title from your rights confirmation emai}
+%%
+%%  Uncomment \acmBooktitle if the title of the proceedings is different
+%%  from ``Proceedings of ...''!
+%%
+%%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%%  June 03--05, 2018, Woodstock, NY}
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+\usepackage{bm}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc} 
+
+\usepackage{optidef}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{subfig}
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Robust Multi-Agent Cooperative Active Sampling System for Efficient Robotic Online Learning}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Ben Trovato}
+\authornote{Both authors contributed equally to this research.}
+\email{trovato@corporation.com}
+\orcid{1234-5678-9012}
+\author{G.K.M. Tobin}
+\authornotemark[1]
+\email{webmaster@marysville-ohio.com}
+\affiliation{%
+  \institution{Institute for Clarity in Documentation}
+  \streetaddress{P.O. Box 1212}
+  \city{Dublin}
+  \state{Ohio}
+  \country{USA}
+  \postcode{43017-6221}
+}
+
+\author{Lars Th{\o}rv{\"a}ld}
+\affiliation{%
+  \institution{The Th{\o}rv{\"a}ld Group}
+  \streetaddress{1 Th{\o}rv{\"a}ld Circle}
+  \city{Hekla}
+  \country{Iceland}}
+\email{larst@affiliation.org}
+
+\author{Valerie B\'eranger}
+\affiliation{%
+  \institution{Inria Paris-Rocquencourt}
+  \city{Rocquencourt}
+  \country{France}
+}
+
+\author{Aparna Patel}
+\affiliation{%
+ \institution{Rajiv Gandhi University}
+ \streetaddress{Rono-Hills}
+ \city{Doimukh}
+ \state{Arunachal Pradesh}
+ \country{India}}
+
+\author{Huifen Chan}
+\affiliation{%
+  \institution{Tsinghua University}
+  \streetaddress{30 Shuangqing Rd}
+  \city{Haidian Qu}
+  \state{Beijing Shi}
+  \country{China}}
+
+\author{Charles Palmer}
+\affiliation{%
+  \institution{Palmer Research Laboratories}
+  \streetaddress{8600 Datapoint Drive}
+  \city{San Antonio}
+  \state{Texas}
+  \country{USA}
+  \postcode{78229}}
+\email{cpalmer@prl.com}
+
+\author{John Smith}
+\affiliation{%
+  \institution{The Th{\o}rv{\"a}ld Group}
+  \streetaddress{1 Th{\o}rv{\"a}ld Circle}
+  \city{Hekla}
+  \country{Iceland}}
+\email{jsmith@affiliation.org}
+
+\author{Julius P. Kumquat}
+\affiliation{%
+  \institution{The Kumquat Consortium}
+  \city{New York}
+  \country{USA}}
+\email{jpkumquat@consortium.net}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Trovato et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+  Online training tasks deployed over mobile robots (robotic online training) have the potential to automatically collect high quality training data to improve the performance of their training Artificial Intelligence (AI) model.
+  While active learning methods aim at finding the training data with highest quality, they fail to produce a navigation path with highest accumulated information gain for the online training tasks because they fail to model the evolution of the training AI model when new training data are collected along the navigation path.
+  To overcome this problem, in this paper, we propose LOss-Dynamics-Aware multi-agent cooperative active sampling system for robotic online training (LODA) that leverages a dynamic perspective of the training AI model that models the evolution of the training AI model and the corresponding information gain as the dynamics of loss value rendered to a sparse 3D grid corresponding to the environment.
+  Using this representation, we are able to recursively predict the information gain of each step taken along a candidate path, and find the optimal path with highest accumulated information gain.
+  Our system can also be easily extended to multiple robots by recursively predicting information gain from the planned path of other robots as an impact of the decision making of the local robot.
+  Evaluation over different sizes of environments and different numbers of robots show at most 6.7\% higher final accuracy and 49.8\% less training time to reach a same high accuracy over the baselines.
+
+
+  % Online training tasks rely on training input consecutively sampled from the real world to refine their training model, and automated mobile devices (robots) shouldering the responsibility of sampling has the potential to further enhance their training performance by actively sampling in reaction to the real-time training quality, besides saving human labor. However, to achieve such active sampling faces two major gaps. First, as the training quality is typically computation-intensive to get for a robot (e.g., validating), where to move for the robot to boost training performance? Second, since the consecutive samples from nearby states (e.g., position, orientation) of a robot are too similar and would limit the training information gain, how to move for better efficiency?
+
+  % We observe that real-time training loss is spatially and temporally related to locations in the environment and implies the level of information gain on further sampling of these locations. The second gap can be overcome by cooperative multi-view sampling from multiple robots, since they are naturally distant in state space. Based on these observation, we choose to build an online training application named MIAS (Multi-robot Implicit Active SLAM) that drives multiple robots to actively and cooperatively sample the environment in real-time reaction to the quality of the training implicit SLAM model. Evaluation shows that MIAS with three robots speeds up the implicit SLAM tasks not only by up to xxX compared to the baselines with three robots, but also by xxX compared to MIAS with single robot.
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+
+% \begin{CCSXML}
+%   <ccs2012>
+%      <concept>
+%          <concept_id>10010520.10010553.10010554.10010556</concept_id>
+%          <concept_desc>Computer systems organization~Robotic control</concept_desc>
+%          <concept_significance>500</concept_significance>
+%          </concept>
+%    </ccs2012>
+% \end{CCSXML}
+  
+% \ccsdesc[500]{Computer systems organization~Robotic control}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+% \keywords{Online Training, Active Learning, Active Sampling, Multi-Agent System, 3D Reconstruction}
+%% A "teaser" image appears between the author and affiliation
+%% information and the body of the document, and typically spans the
+%% page.
+
+% \received{20 February 2007}
+% \received[revised]{12 March 2009}
+% \received[accepted]{5 June 2009}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+
+\input{src/1.intro.tex}
+\input{src/2.background.tex}
+\input{src/3.overview.tex}
+\input{src/4.design.tex}
+\input{src/5.implementation.tex}
+\input{src/6.evaluation.tex}
+\input{src/7.conclusion.tex}
+
+% \newpage
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{acmart}
+\end{document}
+\endinput
+
+%%
+%% End of file `sample-sigconf.tex'.

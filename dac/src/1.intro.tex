@@ -1,0 +1,57 @@
+\section{Introduction}
+The recent flourishing of machine learning~\cite{chowdhary_natural_2020,brown_language_2020,openai_gpt-4_2023} is emphasizing the importance of both quantity and quality (or information gain) of training data for high performance (e.g., accuracy) when training an Artificial Intelligence (AI) model~\cite{zha_data-centric_2023}.
+For online training tasks typically (e.g., domain adaptation~\cite{wilson_survey_2020,ahmed_unsupervised_2021}, implicit rendering~\cite{li2022bnvfusion,sucar_imap_2021,zhu_nice-slam_2022} deployed over mobile robots which consecutively take unlabelled sample (e.g., images, lidar) from the environment as training input for an AI model, enabling automatic acquisition of high quality training data on the robots will boost the performance of their training AI model.
+
+
+% Online training tasks (e.g., implicit SLAM, domain adaptation, long term learning) take unlabelled training input consecutive sampled from the real world to refine their training model for better performance in the changing real world environments. The sampling of such training input typically relies on human labor (e.g., the RGBD image sequences captured by hand-held camera in implicit SLAM); offloading such online training tasks to automated mobile devices (robots equipped with GPUs) not only enables automated sampling, which saves human labor, but also has the potential to enable active sampling in reaction to the real-time training quality to boost training performance (e.g., sample the training input with highest training information gain).
+The existing related domain, active learning~\cite{avidan_activenerf_2022,ash2020deep,nguyen2022measure} estimates the information gain of possible training input for the training AI model according to metrics such as gradients or uncertainty.
+But unfortunately, the found training data of highest estimated information gain as the acquisition target fails to form a navigation path for the robot to collect high quality training data.
+% Specifically, they estimate certain metrics of the AI model such as uncertainty of output or gradient records during the previous training and find possible training data of highest quality (highest information gain) from the environment for the training AI model.
+% But 
+% Unfortunately, although several existing domains, such as active learning and model uncertainty estimation, find possible training data of highest quality (highest information gain) from the environment for the training AI model, simply assigning such training data as a pursuit target of the robot is problematic.
+Specifically, the robot is moving and sampling in a continuous world and along the path the robot tends to collect similar samples as the acquisition target, which in turn causes more low quality training data being input.
+In our evaluation, such methods cause the similarity between consecutively collected training data to be over 84.28\% (measured in SSIM).
+Another problem of such methods is that such methods cannot be scaled to multiple robots, because after each planning step on one robot, the information gain estimation must be re-optimized to account for newly added training input~\cite{avidan_activenerf_2022,jin_neu-nbv_2023,ash_deep_2020}, which cannot run in parallel.
+% When the found possible training data of highest quality for the current training AI model is assigned as the acquisition target of one robot, it is unclear 
+% When the possible training data of highest quality for the current training AI model is found, 
+% the next possible training data of highest quality can only be calculated after the training AI model is trained with the newly collected training data
+
+
+The key reason of the above problem is that when searching for navigation path (the acquisition destination), they are viewing the training AI model in a static perspective.
+As online training of the AI model proceeds, the parameters of the AI model keeps evolving and thus, the possible training data of highest quality is also changed, especially when the robot starts navigating and new training data is collected.
+Failure to model such AI model evolution in path searching leads to low quality of training data collected along the navigation path.
+
+
+% The above methods greedily pursue the training data of highest quality to the current AI model and fail to model the state change of the training AI model along the path in the future, lowering the quality of training data collected along the navigation path.
+
+To tackle the above problem, a dynamic perspective of the training AI model is necessary while searching for a path, which is difficult to predict since the training data sampled in the future are not available.
+Instead, we observe that if we relate the training loss with the zones of the environment of their corresponding training input, its dynamics (varying trend) have the potential to predict future training loss if the same zone is sampled in the future, whose diff reflects possible information gain and AI model evolution.
+The predicted future training loss can recursively serve as the basis of the prediction of the training loss when a further step is taken and finally forms the prediction of the accumulated information gain along the whole path, with which we can search for an optimal path with highest accumulated information gain.
+
+Notably, this method can easily be extended to multi-agent cooperation: an agent can directly plan its own path based on the predicted training loss from the planned path shared by other agents, which enables co-operative multi-view sampling across different agents, so as to alleviate the limitation of the continuous action and sampling space of a single robot.
+
+Based on these ideas, we propose LOss-Dynamics-Aware multi-agent cooperative active sampling system for robotic online training (LODA).
+In LODA, we distribute the online training workload across all agents involved and renders the training loss to a sparse 3D grid on each agent which acts as the representation of the training loss dynamics.
+With this representation, we propose LOss-Dynamics-Aware Recursive Path Planning (LODA-RPP) algorithm: given candidate paths based on path searching algorithms such as Random Rapid Tree algorithm, we use an online trained small multi-layer perception model (MLP) to recursively predict the future training loss after taking each step of a candidate path, which approximates the accumulated information gain along the path.
+If planned paths from other robots are received, their predicted future training loss will be temporarily merged into the grid representation as the basis of path planning.
+% TODO
+In this way, each agent finds a cooperative multi-view sampling path that optimizes accumulated information gain by considering the AI model state evolution modelled by loss dynamics, leading to higher quality of collected training data and higher performance of the training AI model.
+
+We implemented LODA based on ROS2 Galactic and PyTorch on Ubuntu20.04 and evaluated its performance across one to two robots involved.
+We choose a state-of-the-art (SOTA) online training task BNV-Fusion~\cite{li2022bnvfusion} in the domain of implicit rendering as the major workload and use Replica~\cite{straub_replica_2019}, a standard computer-vision dataset, together with Habitat simulator~\cite{szot2021habitat} and evaluated LODA across different sizes of the simulated scenes.
+We select two SOTA active learning baselines~\cite{ash2020deep,avidan_activenerf_2022} as the major baselines.
+Evaluation shows that:
+\begin{itemize}
+    \item LODA is accurate. Compared to baselines, LODA improved the accuracy of the training AI model being training underlying online training task by 6.7\% $\sim$ 0.7\% due to the improved quality of sampled training input from the environment.
+    \item LODA is efficient. The time reaching the same accuracy of the training AI model was at most reduced by 49.8\% compared with the baselines.
+    % \item LODA is cooperative. Ablation study shows that the cooperation by sharing the planned path among all robots contributed to xx\% $\sim$ xx\% of the accuracy improvement compared with the cases where the cooperation is disabled.
+\end{itemize}
+
+The major contributions of this paper is we propose a novel dynamic perspective of training AI model modelled with the loss dynamics of the environment for automatic high quality training data acquisition in robotic online training tasks to improve the performance of training AI model.
+Our proposed system LODA and the LODA-RPP algorithm together model the accumulated training information gain of candidate paths and find an optimal path for robot sampling that optimizes the overall quality of collected training data.
+It also enables efficient multi-robot multi-view cooperation that further increases the quality of training data by simply sharing the planned path among the robots.
+They will nurture the development of more real-world robotic online training applications and improving their performance by enabling efficient and high performance automatic high quality training data acquisition.
+
+
+% The rest of this paper is organized as follows:...
+

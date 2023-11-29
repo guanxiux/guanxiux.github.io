@@ -1,0 +1,12 @@
+\section{Implementation}
+
+We implemented LODA based on Robot Operation System 2 (ROS2) Galactic, Python3.8 and PyTorch on Ubuntu20.04, using the default navigation stack of ROS2.
+We maintained the Loss World Grid on a sparse coordinated tensor using PyTorch, instead of a dense tensor, because in a room there are typically a lot of empty space that holds no useful information and will not have loss being computed.
+This design significantly reduces the memory and computation burden.
+% The sparse coordinated tensor of PyTorch currently only supports index selection along one dimension, which is inconvenient for computation over the 4 dimensional Loss World Grid.
+% Thus we created a flattening interface that stores the Loss World Grid as a two dimensional sparse tensor and coverts multi-dimensional indexing over the Loss World Grid to one dimensional indexing, so as to support efficient analysis and computation over the Loss World Grid.
+% To support slicing and index selection in the Loss World Grid that is compulsory for enquiry of features from the Loss World Grid and compute partial updates of it, we virtually 
+
+% LODA on one robot communicates with the underlying online training task and other robots via the ROS2 interface.
+% Using the Data Distribution Service of ROS2, LODA and the underlying online training task run on different processes avoiding the performance bottleneck of GIL of Python and can exchange the planned paths and training loss with each other and other robots needless to explicitly handle the network connections between them.
+% We use the default navigation stack of ROS2, Nav2, which is responsible to find and mark navigable places based on sensor input and execute the planned path step by step, while avoiding obstacles.

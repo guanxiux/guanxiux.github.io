@@ -1,0 +1,113 @@
+\section{Introduction}
+
+% New requirements for NBV for implicit view synthesis
+Next Best View (NBV)~\cite{1087372,Biss_NBV,guedon_scone_2022,jin_neu-nbv_2023} aims to iteratively find a shortest and most informative sequence of sensor positions (views) to acquire RGB images in a previous unknown scene to boost efficiency and accuracy of view synthesis of 3D scenes~\cite{sun_direct_2022,li_bnv-fusion_2022,jin_neu-nbv_2023}, which is a fundamental task for downstream applications such as augmented/virtual reality and autonomous driving~\cite{chen_active_2011}.
+The existing NBV methods~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023} for classic view synthesis typically feature the model representation of a sole multi-layer perception model (MLP) and predicting output uncertainty (e.g., standard deviation) from a view.
+% There exists NBV methods~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023} for classic view synthesis that typically features the model representation of a sole multi-layer perception model (MLP).
+% They typically
+% Methods for view synthesis 
+
+However, while the emerging representation of implicit voxel grid for view synthesis (grided view synthesis)~\cite{sun_direct_2022,li_bnv-fusion_2022,zhu_nice-slam_2022} is becoming a game changer of this domain with its advantages to recover fine details of the 3D scene while significantly saving training time and training GPU memory footprint, it is also incurring problems for the existing NBV methods~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023} for view synthesis.
+Specifically, such representation divides the 3D scene and the training model and map them into pairs of local geometries and local latent codes in grid cells.
+And each local latent code is trained to model comparatively a simpler local geometry for fast convergence and only a subset of local latent codes need to be optimized for each view.
+% A smaller MLP is responsible to decode local geometries of a view from the local latent codes.
+% Each local latent codes only need to model comparatively a simple local geometry for fast convergence and only a subset of local latent codes need to be optimized for each view in view synthesis for minimal GPU memory footprint.
+% There exist many NBV methods for explicit 3D scene representation~\cite{guedon_scone_2022} (e.g., point clouds) and implicit 3D scene representation~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023} (e.g., multi-layer perception (MLP) model).
+% However, the emerging grided 
+% This sequence is typically retrieved by iteratively estimating information gain of candidate views and adding the highest one to the sequence.
+% While traditional NBV methods process an explicit 3D representation (e.g., point cloud) heuristically or with AI models to find most informative views (e.g., frontiers), the emerging implicit view synthesis methods~\cite{sucar_imap_2021,mildenhall_nerf_2020,li_bnv-fusion_2022,zhu_nice-slam_2022} exploit implicit representation (implicit view synthesis) to achieve finer textural information, scene completion, etc., but also incur difficulty for NBV due to the absence of explicit representation.
+
+
+% Such training pattern invalidates the existing prediction based NBV methods~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023}:
+% The existing prediction based NBV methods~\cite{shen_stochastic_2021,jin_neu-nbv_2023,ran_neurar_2023} typically view the model output as a probabilistic distribution (e.g., Gaussian distribution) and train an extra model head for the sole MLP that predicts the uncertainty (e.g., standard deviation) of the model output as the information gain estimation, but they fail to produce reasonable uncertainty prediction in the grided representation.
+
+% Specifically, the representation of implicit voxel grid for view synthesis divides the 3D scene and the training model and map them into pairs of local geometries and local latent codes in grid cells.
+% A smaller MLP is responsible to decode local geometries of a view from the local latent codes.
+% Each local latent codes only need to model comparatively a simple local geometry for fast convergence and only a subset of local latent codes need to be optimized for each view in view synthesis for minimal GPU memory footprint.
+In such case, each voxel cell on the voxel grid are separately and imbalancedly trained and there is often not enough information for a local latent code to model the standard deviation of its output: frequently visited local latent codes will output low uncertainty prediction while those less frequently visited outputs randomly.
+We even recorded worse NBV selection performance of the prediction-based NBV methods than the random strategy.
+
+To tackle this problem, we notice an intuition that under small view position and direction perturbation, the observed RGB value of a spot in the 3D scene varies in a continuous way.
+It implies that the output space (and loss space) of pixels of the image captured from a finely synthesized view is flat.
+Thus the sharpness of the loss space can serve as a hint to find the uncertain views with high information gain, without the need for extra training.
+% It implies that for pixels of the image captured from a finely synthesized view, small perturbation in the view position and direction would result
+
+% However, such training pattern invalidates the existing prediction based NBV methods: they typically view the model output as a probabilistic distribution (e.g., Gaussian distribution) and train an extra model head that predicts the uncertainty (e.g., standard deviation) of the model output as the information gain estimation
+
+
+% Difficulties for uncertainty estimation in implicit NBV
+% For implicit representation, a straight-forward estimation of information gain when inputting a candidate view for training is the reduction of uncertainty of model parameters~\cite{tran_bayesian_2019,maddox_simple_2019}, which is, however, reported to be computation expensive and intrusive to the model structure and training process.
+% To tackle these problems, prior work~\cite{yan_active_2023,avidan_activenerf_2022,jin_neu-nbv_2023,ran_neurar_2023,shen_stochastic_2021} estimate the uncertainty of model output (e.g., reconstructed 3D scene from a view) as approximation of information gain.
+% They typically view the model output as a probabilistic distribution (e.g., Gaussian distribution) and train an extra model head that predicts the uncertainty (e.g., standard deviation) of the model output as the information gain estimation.
+% They typically model how much the reconstructed 3D model disagree with the existing training data and implies opportunity for further improvement.
+% They train an extra model head to predict the uncertainty (e.g., standard deviation) of the model output and the most uncertain view is selected as NBV.
+
+% However, the cutting-edge grided implicit view synthesis~\cite{li_bnv-fusion_2022,zhu_nice-slam_2022,chabra2020deep,genova2020local} brings challenge to these methods, where they suffer frequent mismatch between estimated uncertainty of model output and actual information gain.
+% Specifically, grided implicit view synthesis decomposes the reconstructing 3D scene to a grid of small local geometries and decomposes the training model to a grid of local latent codes, each mapping one small geometry, so that each latent code fits to the reconstructing geometry in real time and also recovers complex local geometries.
+
+% While these methods~\cite{yan_active_2023,avidan_activenerf_2022,jin_neu-nbv_2023,ran_neurar_2023,shen_stochastic_2021} are good at discovering details in candidate views not attended by the training model, the grided implicit view synthesis minimizes such uncertainty with decomposition, and further incurs a new type of uncertainty that they did not consider, uncertainty caused by capacity limit of local latent codes.
+% These methods typically assume a simple reconstructing 3D scene and a model large enough to model the whole scene, which do not hold in grided implicit view synthesis, where local latent codes could reach their capacity limit, causing high uncertainty of model output from these latent codes but limited information gain.
+% As a result, the NBV selections of these methods often mismatch with the actual improvement of the reconstructed model, causing the lower reconstruction quality reported in our evaluation.
+% Also, these methods require inference of the model to estimate uncertainty for each candidate view, which is heavy when the number of candidate views increases for more accurate estimation and even prolonged the whole training process by 1.5$\sim$2 times when estimating 100 candidate views at each NBV selection.
+
+Based on the above observation, we propose SharpView, an NBV algorithm that first introduces the sharpness of loss space into information gain estimation in NBV selection for grided view synthesis.
+For estimation of the sharpness of loss space of a view, we generate reasonable pseudo labels (RGB values) by referring the output of the training model from the previously trained views at the same spot as a perturbation for loss computation.
+We then back propagate the computed loss against the pseudo labels and compute the sharpness of loss space of a view as the norm of last layer of parameters of the model (the smaller MLP).
+
+In this way, we are able to find the most uncertain views with sharpest loss space, without being influenced by imbalanced training progress of each voxel cell.
+We summarize our contributions as follows:
+\begin{itemize}
+    \item SharpView is the first NBV algorithm that takes sharpness of loss space into consideration for information gain estimation in NBV selection.
+    \item We design a pseudo labelling mechanism for new views for sharpness computation.
+    \item Sharpness performs best among the baselines in various benchmarks.
+\end{itemize}
+
+We discuss the related work in Section~\ref{background}, and introduce our notation, settings and algorithm of SharpView in Section~\ref{methodology}.
+We present our experiments in Section~\ref{exp} and then conclude in Section~\ref{conclusion}.
+% In the following sections, 
+
+
+
+
+% In this paper, we propose Training-time Uncertainty Estimation for next best View in implicit view synthesis (SharpView).
+% Since the local latent codes have limited capacity, instead of predicting output uncertainty, we propose to track the certainty of local latent codes for grided implicit view synthesis.
+% Although accurate estimation of uncertainty of model parameters is challenging and computation expensive as stated above, we propose an algorithm Training-Time Certainty Estimation (TTCE) to track how certain the current values of each local latent codes is based on previous training by aggregating and comparing their synaptic dynamics during training, which suffices for NBV selection.
+% % In SharpView, we maintain an online estimation of the uncertainty of the latent codes by aggregating their synaptic dynamics during training.
+% Leveraging the knowledge about the 3D correspondence of each local latent codes, we are able to distinguish the local latent codes within the camera frustum of a view and render their estimated certainty to an image for each candidate view as information gain estimation, without incurring any extra training or inference computation burden.
+% As a result, SharpView is suitable for edge devices with limited computation resources such as robots where NBV for view synthesis is typically deployed.
+% As the grided latent codes each have their 3D correspondence in the 3D scene, we estimate the uncertainty of latent codes visited by candidate views (lying within their camera frustums) for NBV selection.
+% In this way, SharpView gets more accurate estimation of possible information gain of candidate views for implicit view synthesis, boosting efficiency and accuracy of implicit view synthesis.
+% Also, these advantages are achieved without the need of training any extra model or incurring any extra inference computation burden, making SharpView suitable for edge devices with limited computation resources such as robots where NBV for view synthesis is typically deployed.
+
+
+% Specifically, implicit view synthesis encodes 3D scene information from a sequence of views (images captured at corresponding sensor positions) to a grided latent space, with a decoder able to extract 3D scene from the latent codes.
+% The latent codes are periodically optimized, minimizing the discrepancies between decoded 3D scene and ground-true view measurements to extract finer geometry and textural information.
+
+% To estimate information gain of candidate views in implicit view synthesis, prior work typically treat decoded 3D scene as a Gaussian distribution.
+% They either online or offline train an extra model head on the decoder to predict the uncertainty (e.g., standard deviation) of decoded 3D scene from a view and the most uncertain view is selected as NBV.
+% However, such methods require inference of the model to predict uncertainty for each candidate view, which is heavy when the number of candidate views is increased for more accurate estimation, especially for edge devices such as robots exploring large scenes.
+% % Worse, the predicted uncertainty itself suffers uncertainty: the uncertainty intuitively represents the possibility of decoded 3D scene to differ from the ground truth, and such uncertainty estimation gets more accurate only when more reference views are input, making their choice of NBV often mismatch with the most informative.
+% Worse, sampling views of high estimated uncertainty of the decoded 3D scene does not necessarily lead to high improvement of it, since the capacity of latent codes has its limit.
+% Thus prediction-based NBV tend to be stuck around certain spots of high uncertainty, while the information gain is limited.
+
+% Specifically, implicit view synthesis encodes 3D scene information from views (images captured at corresponding sensor positions) to a grided latent space, with a decoder able to extract 3D scene from the latent space given 3D coordinate query.
+% The latent space is periodically optimized under the supervision of captured views to extract geometry and textural information.
+% The key reason for the difficulty of prediction based methods is that the uncertainty of decoded 3D scene at a coordinate intuitively represents its possibility to differ from the ground truth, and such uncertainty estimation gets more accurate only when more reference views are input, which means less uncertain. 
+% To alleviate these problems, we observe that the possible information gain of a new view is fundamentally related to how much the underlying latent codes can be changed by training with this view being input, or more precisely the uncertainty of the latent codes after being trained with existing views.
+% Inspired by studies of continual learning, if we treat training the latent codes based on a newly captured view (together with previously captured views) as a new task, the uncertainty of the latent codes can be represented as how much the latent codes were consolidated by previous training, computed based on the synaptic dynamics (gradient and parameter update records) during training.
+
+% As the grided latent codes each have their 3D correspondence in the 3D scene, estimating the uncertainty of latent codes visited by candidate views can provide hints for NBV selection in implicit 3D rendering.
+
+% In this paper, we propose Training-time latent code Uncertainty Estimation for next best View in implicit view synthesis (SharpView).
+% In SharpView, we maintain an online estimation of the uncertainty of the latent codes by aggregating their synaptic dynamics during training.
+% As the grided latent codes each have their 3D correspondence in the 3D scene, we estimate the uncertainty of latent codes visited by candidate views (lying within their camera frustums) for NBV selection.
+% In this way, SharpView gets more accurate estimation of possible information gain of candidate views for implicit view synthesis, boosting efficiency and accuracy of implicit view synthesis.
+% Also, these advantages are achieved without the need of training any extra model or incurring any extra inference computation burden, making SharpView suitable for edge devices with limited computation resources such as robots where NBV for view synthesis is typically deployed.
+
+% The main contributions of this paper are as follows:
+% \begin{itemize}
+%     \item We introduce an efficient uncertainty estimation algorithm (TTCE) for the emerging representation of grided local latent codes that tracks the certainty of local latent codes purely from synaptic dynamics collected during training. Compared with prior work, our proposed algorithm directly operates on latent codes and incurs little computation burden, making it suitable for edge devices where NBV is typically deployed.
+%     \item We propose a new next-best-view system (SharpView) for the emerging grided implicit view synthesis. By directly rendering the estimated certainty of grided latent codes, we avoid the interference of capacity limit of local latent codes and get more accurate estimation of possible information gain of candidate views, boosting the efficiency and accuracy of implicit view synthesis.
+%     \item Experiments on various complex 3D objects and large scale indoor scenes show that SharpView improved the quality of the reconstructed 3D model over the baselines, while only introducing a negligible (about 10\%) extra computation time. The source code to reproduce our results is publicly released at \url{https://github.com/aaai_5846_paper/SharpView}.
+% \end{itemize}
+

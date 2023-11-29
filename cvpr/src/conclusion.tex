@@ -1,0 +1,6 @@
+\section{Conclusion\label{conclusion}}
+While the cutting-edge grided view synthesis boost the state-of-the-art performance of view synthesis, it incurs difficulty for NBV selection since latent codes in the grid are imbalancedly trained.
+In this paper, we present SharpView, the first NBV algorithm for grided view synthesis that incorporates loss space sharpness estimation into information gain estimation for NBV selection.
+By simply leveraging pseudo ray labelling, we estimate the sharpness of loss space of the current training model at candidate views by calculating the gradients of parameters of the last layer of the view synthesis pipeline, without the need to train or infer extra information from the latent codes, so that more accurate information gain estimation can be achieved.
+% In this paper, we present Training-time Uncertainty Estimation for next best View in implicit 3D reconstruction (SharpView).
+% SharpView estimates certainty of local latent codes and leverages the 3D corresponding between local latent codes and the local geometries in the 3D scene to estimate certainty to render and estimate the potential information gain from candidate views to get an more accurate modelling of possible model improvement.

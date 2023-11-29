@@ -1,0 +1,80 @@
+% CVPR 2024 Paper Template; see https://github.com/cvpr-org/author-kit
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE  - PLEASE UPDATE FOR FINAL VERSION
+% \usepackage{cvpr}              % To produce the CAMERA-READY version
+\usepackage[review]{cvpr}      % To produce the REVIEW version
+% \usepackage[pagenumbers]{cvpr} % To force page numbers, e.g. for an arXiv version
+
+% Import additional packages in the preamble file, before hyperref
+\input{preamble}
+
+% It is strongly recommended to use hyperref, especially for the review version.
+% hyperref with option pagebackref eases the reviewers' job.
+% Please disable hyperref *only* if you encounter grave issues, 
+% e.g. with the file validation for the camera-ready version.
+%
+% If you comment hyperref and then uncomment it, you should delete *.aux before re-running LaTeX.
+% (Or just hit 'q' on the first LaTeX run, let it finish, and you should be clear).
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,citecolor=cvprblue]{hyperref}
+\usepackage{bm}
+\usepackage{optidef}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{multirow}
+% \usepackage{subfig}
+%%%%%%%%% PAPER ID  - PLEASE UPDATE
+\def\paperID{16110} % *** Enter the Paper ID here
+\def\confName{CVPR}
+\def\confYear{2024}
+
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{Deep Sharpness-Aware Next Best View Selection for Grided View Synthesis}
+
+%%%%%%%%% AUTHORS - PLEASE UPDATE
+\author{Anonymous}
+% \author{First Author\\
+% Institution1\\
+% Institution1 address\\
+% {\tt\small firstauthor@i1.org}
+% % For a paper whose authors are all at the same institution,
+% % omit the following lines up until the closing ``}''.
+% % Additional authors and addresses can be added with ``\and'',
+% % just like the second author.
+% % To save space, use either the email address or home page, not both
+% \and
+% Second Author\\
+% Institution2\\
+% First line of institution2 address\\
+% {\tt\small secondauthor@i2.org}
+% }
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Next Best View (NBV) aims at identifying the next most informative sensor position (view) for 3D reconstruction or view synthesis in a 3D scene.
+In this paper, we focus on NBV for view synthesis with the emerging representation of implicit voxel grids, which is becoming the game changer with its advantages to recover fine details of the 3D scene while significantly saving training time and training GPU memory footprint.
+However, the nature that the latent codes in each voxel cell on the voxel grid are separately and imbalancedly trained induces problem with the existing prediction-based NBV methods where no reasonable information gain prediction can be made across different cells.
+To overcome this problem, we present SharpView, an NBV algorithm that first introduces the sharpness of loss space into information gain estimation based on an intuition that the training model has a soft output space around the finely synthesized views.
+% This is based on a intuitive observation that the training model has a soft output space around the finely synthesized views, which complies with the continual RGB value shift when the view point of camera is perturbed in the real world.
+To estimate sharpness of loss space of a candidate view, we design a pseudo labelling mechanism that incorporates the output of previous trained views and estimate the gradient embedding norm in the last model layer.
+We conduct experiments on various view synthesis benchmarks which confirmed that SharpView outperforms the baselines in finding NBV for view synthesis with the representation of implicit voxel grids.
+The source code for result reproduction is available at \url{https://github.com/cvpr_16110/SharpView}.
+\end{abstract}
+
+\input{src/intro}
+\input{src/background}
+\input{src/methodology2}
+\input{src/experiment2}
+\input{src/conclusion}
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+
+% WARNING: do not forget to delete the supplementary pages from your submission 
+% \input{sec/X_suppl}
+
+\end{document}

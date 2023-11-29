@@ -1,0 +1,78 @@
+\section{Background\label{background}}
+\subsection{Neural Implicit Representations}
+Neural implicit representation~\cite{mildenhall_nerf_2020,sucar_imap_2021,li_bnv-fusion_2022,zhu_nice-slam_2022,jin_neu-nbv_2023} is a emerging mapping representation demonstrating promising results for object geometry reconstruction, scene completion, novel view synthesis and also generative modelling.
+They typically feature a Neural Radiance Field (NeRF)~\cite{mildenhall_nerf_2020} structure that learns a density and radiance field supervised by 2D views (camera position \& orientation and the images captured) with an MLP model.
+iMAP~\cite{sucar_imap_2021} uses a single MLP neural model as the underlying 3D scene representation and with a comparatively simple implicit representation and efficient rendering pipeline, iMAP achieves near real-time performance in training.
+
+However, recent researches~\cite{chabra2020deep,9156855,genova2020local,li_bnv-fusion_2022,zhu_nice-slam_2022} report a single MLP representation is not scalable due to limited capacity and tends to ignore complex details.
+They propose to decompose the whole 3D scene to grided local scenes and train local implicit representations to map the local geometry in each local scene, 
+which improves the level of detail in reconstruction because each local implicit representation only needs to map a local region rather than the geometry of a whole scene.
+Organizing the local implicit representations as a grid, we can easily find the 3D correspondence between the local implicit representations and the 3D scene, which is the basis of our proposed method.
+
+\subsection{Grided Implicit Rendering}
+Along the decomposition of the implicit representation to grided local implicit representations, some~\cite{li_bnv-fusion_2022,zhu_nice-slam_2022} also decompose the training pipeline to effectively leverage prior knowledge of local geometries embedded in MLP.
+Specifically, they~\cite{li_bnv-fusion_2022,zhu_nice-slam_2022} separate the MLP model to an AutoEncoder-like network that consist of an encoder, grided latent codes and a decoder, with the encoder and the decoder pretrained over various scenes to extract generalizable knowledge of 3D reconstruction.
+Because they only need to optimize the local latent codes, they manage to reconstruct complex geometry of 3D scenes in a view with several training iterations, retaining real-time performance as imap~\cite{sucar_imap_2021}.
+Among these work, we select BNV-Fusion~\cite{li_bnv-fusion_2022} as our major research target, which takes depth images and camera poses as input and achieves high quality shape reconstruction of complex 3D scene.
+
+\subsection{Next Best View}
+Traditional NBV~\cite{Biss_NBV,guedon_scone_2022,1087372} typically aims to find a shortest sequence of views from a set of candidate views that optimize the coverage of a previously unknown area.
+Given the existing partial explicit map (e.g., point cloud), they either heuristically find frontiers of the map, or predict views with AI models that optimize coverage.
+With the emerging implicit 3D reconstruction being able to reconstruct finer details of the complex 3D scene, optimizing accuracy is also an emerging requirement for NBV~\cite{avidan_activenerf_2022,jin_neu-nbv_2023,ran_neurar_2023,shen_stochastic_2021}, where the most valued information gain is the improvement of the quality of the reconstructed 3D model.
+
+\subsection{Uncertainty Estimation}
+The information gain from training data for a training model can be directly modeled as the uncertainty reduction of model parameters, and such uncertainty estimation is a long-standing problem~\cite{ABDAR2021243,gal2016dropout,lakshminarayanan2017simple,maddox_simple_2019,tran_bayesian_2019,bissiri_general_2016} for machine learning.
+A classic framework for uncertainty estimation is the Bayesian Learning framework that estimates the posterior distribution of the model given the existing training data.
+% The posterior distribution can reflect the uncertainty of the model output during inference.
+However, such approaches typically require multiple model evaluations which are computationally expensive, and require significant modifications over network architectures and training procedures~\cite{shen_stochastic_2021,tran_bayesian_2019}.
+
+Recent work focusing on the NeRF structure approximate the uncertainty of model parameters with the posterior distribution of the output density and radiance (uncertainty of the model output)~\cite{shen_stochastic_2021,avidan_activenerf_2022,ran_neurar_2023,jin_neu-nbv_2023}.
+They typically follow the pattern of generalization of standard NeRF~\cite{shen_stochastic_2021} that learns a probability distribution over all the possible radiance fields modeling the scene, 
+where an extra model head is trained to estimate the variance of the radiance fields under the supervision of existing views.
+
+% In the case of a sole MLP modelling the whole 3D scene, 
+
+% However, when facing the representation of implicit voxel grid, due to the nature that each voxel cell on the voxel grid are separately and imbalancedly trained
+
+% Intuitively, the standard deviation of distribution of model output stems from the model not attending to high-frequency details.
+% However, the grided implicit 3D reconstruction~\cite{li_bnv-fusion_2022,zhu_nice-slam_2022} on the one hand minimizes such uncertainty by decomposition, on the other hand incurs an extra source of uncertainty caused by the capacity limit of local latent codes, which severely disturbs the NBV selection of the prior methods by incurring high uncertainty of model output and limited information gain from certain views.
+% As a result, these methods tend to be stuck at certain spots where the corresponding local latent codes reach their capacity limit, causing inefficiency.
+
+% Using a finer-grained (denser) grid of latent codes seems to be a simple remedy, which avoids the local latent codes to reach their modeling capacity, but this remedy results in a much larger model size and GPU memory consumption and also, it is reported~\cite{li_bnv-fusion_2022,zhu_nice-slam_2022} a too fine-grained grid of latent codes results in not enough training data input within each local region (number of rays casting to each local latent codes will be reduced) for training the local embedding, causing holes in the reconstructed model.
+% In a word, the uncertainty caused by the capacity limit of local latent codes would be a common problem in grided implicit 3D reconstruction.
+
+
+% However, a major difficulty of these methods is that uncertainty of the model output often mismatches with uncertainty of the local latent codes in implicit 3D reconstruction.
+% Intuitively, uncertainty in implicit 3D reconstruction comes from three sources: uncertainty caused by limited capacity of the model, uncertainty caused by model not attending to high-frequency details that can be optimized by further training and sampling, noises.
+% The posterior distribution of the output is good at discovering the second type of uncertainty by 
+
+
+% \subsection{Continual Learning}
+% categories  memory, multi-task, regularization,
+\subsection{Connection to Other Sharpness Methods}
+In the domain of active learning, there exists other methods~
+\cite{keskar_large-batch_2017,ash_deep_2020,jiang_fantastic_2019,kim_saal_2023} that also inspect the flatness of loss space and use gradients as an indicator of its sharpness.
+To the best of our knowledge, they~\cite{keskar_large-batch_2017,ash_deep_2020,jiang_fantastic_2019,kim_saal_2023} are focused on classification problems where the model output is the activated by a softmax function and the pseudo labelling policy is simply selecting the value with highest probability in the output, which cannot work with implicit rendering pipeline where rgb values are directly output .
+We are the first work to connect loss space sharpness with implicit rendering pipeline by introducing the pseudo labelling policy based on the intuition of continuity of rgb values around a small region of viewpoints.
+
+\subsection{Grided View Synthesis}
+Here we discuss the notation of grided view synthesis in details.
+Assume that we equally divide the 3D scene of interest into $M$ cells under certain resolution and the
+implicit voxel grid for view synthesis can be represented as pairs of 3D coordinates of local geometries and local latent codes modelling the local geometry: $G=\{(x_i,\theta_i)\}_{i=1}^M$.
+Given a step on a ray $r=(x,d)$ where $x$ is a coordinate in the 3D scene and the $d$ is the viewing direction, we query the pairs for the closest distance $\theta_j = Q(G,r)$ and then use MLP models to decode the density $\sigma$ and view-direction-dependent color $c$ from the corresponding local latent codes: $\sigma,c=MLP(\theta_j, d)$.
+
+To render the color $C(r)$ of a pixel on an image from a view, we cast a ray with $K$ steps, $\bm{r}=\{r_i\}_{i=1}^K$ from the center of the camera through the pixel and query the implicit voxel grid for density and rgb values at each step $\{\sigma_i, c_i\}_{i=1}^K$.
+Finally, the queried results are accumulated to compute $C(r)$.
+\begin{subequations}
+    \begin{align}
+        \label{accu}
+        C(\bm{r}) &= \sum_{i=1}^{K}T_i \alpha_i c_i \\
+        \alpha_i &= 1 - exp(-\sigma_i \delta_i) \\
+        T_i &= \prod_{j=1}^{i-1} (1-\alpha_j)
+    \end{align}
+\end{subequations}
+where $\alpha_i$ is the probability of termination of ray at step $i$, $T_i$ is the accumulated transmittance and $\delta_i$ is the distance between consecutive steps.
+% \begin{equation}
+%     C(r)=\sum_{i=1}^{K}T_i \alpha_i c_i
+% \end{equation}
+We gather the rgb value of each pixel on the image from a view and forms the predicted image $I$ from view $v$ and the loss is calculated against the groundtruth image $\hat{I}$ with mean square error $l_{mse}(I, \hat{I})$.

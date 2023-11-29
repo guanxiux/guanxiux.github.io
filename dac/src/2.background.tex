@@ -1,0 +1,61 @@
+\section{Background \& RELATED WORK\label{background}}
+
+% \subsection{Online Training on Multi Robot}
+% Machine learning (ML) approaches are generally trained for a specific task on a dedicated training set. However, in many real-world applications, Labeling datasets are very expensive, and the data distributions can differ or even change over time. Therefore, Some unsupervised methods are proposed to learn knowledge from unlabeled data and make the machine learning model to adapt the new dynamic environment. For example, dynamic unsupervised domain adaptation methods\cite{tian2022unsupervised} is proposed to adapt a pretrained model to a new environment by training it with both unlabeled data from the dynamic environment. 
+
+% With the rapid development of such methods, robots can adapt their pretrained models to new scenarios(e.g., domain shifts or changing data distributions) after training with online collected data to retain the high accuracy of the models. As another example, neural implicit representations have recently become popular in simultaneous localization and mapping (SLAM), especially in dense visual SLAM. This method enables high-fidelity and dense 3D scene reconstruction by collecting unlabeled image sequences with RGB-D sensors in real-time. We envision the prosperity of these multi-robot collaborations and unsupervised learning methods are making online training on real-time collected data on multi-robot realistic.
+
+
+% \subsection{Multi-robot System}
+% For time-sensitive Search and Rescue (SaR) missions, using multiple cooperative robots is useful since they allow for quick environment exploration and offer more redundancy than using a single robot. A fully distributed SLAM system for robotic teams that can identify inter-robot loop closures without exchanging raw data was proposed by Pierre-Yves Lajoie et al\cite{8962967}.A completely distributed multi-robot system for dense metric-semantic SLAM is proposed by Yun Chang et al.\cite{9561090} Every robot creates a local mesh and a local trajectory estimate. When two robots are in communication range, they start a distributed place identification and resilient pose graph optimization process.A multi-robot system is proposed to complete the online training task, each robot is equipped with a Jetson Xvaier NX for computation.
+
+% \subsection{Related Work} 
+% \noindent\textbf{Dense Visual SLAM.} Visual SLAM is an online approach that incrementally creates the map of an environment while localizing the robot within it. Meanwhile, it is an area that has received much attention in both industry and academia. Specifically, sparse visual SLAM algorithms estimate accurate camera poses and only have sparse point clouds as the map representation, While sparse visual SLAM algorithms estimate accurate camera poses and only have sparse point clouds as the map representation, dense visual SLAM approaches focus on recovering a dense map of a scene, which makes the method very suitable for 3D reconstruction. Dense tracking and mapping (DTAM), proposed by Newcombe et al. \cite{newcombe2011dtam}, was the first fully direct method in the literature. 
+
+
+% \noindent\textbf{Neural Implicit-based SLAM.} Neural implicit representations \cite{mildenhall2021nerf} have shown great performance in many different tasks, including 3D reconstruction \cite{mescheder2019occupancy,park2019deepsdf,peng2021shape,liu2020dist}, scene completion \cite{peng2020convolutional,lionar2021dynamic,jiang2020local}, novel view synthesis \cite{reiser2021kilonerf,martin2021nerf,tancik2022block,pumarola2021d,verbin2022ref}, etc. In terms of SLAM-related applications, some works \cite{chng2022gaussian,clark2022volumetric} try to jointly optimize a neural radiance field and camera poses, but they are not suitable for large objects or wide range of camera motion. In addition, some recent works \cite{chung2022orbeez,rosinol2022nerf} can support large-scale mapping, but they mainly rely on state-of-the-art SLAM systems like ORB-SLAM to obtain accurate camera poses, and do not produce 3D dense reconstruction.
+
+% NICE-SLAM \cite{zhu2022nice} and iMAP \cite{sucar2021imap} are the most famous two SLAM pipelines using neural implicit representations for both mapping and camera tracking. Since iMAP uses a single MLP as the scene representation so they are only adapt to small scenes,whereas NICE-SLAM, which uses hierarchical feature grids and small MLPs as the scene representation, can scale up to considerably bigger interior spaces. Nevertheless, it calls for RGB-D inputs, which restricts their use in outdoor settings or when only RGB sensors are available. In order to solve this problem, a new work named NICER-SLAM\cite{zhu2023nicer}was proposed, which is the first dense RGB-only SLAM, optimizes mapping and tracking end-to-end and also allows the high-quality synthesis of new views.
+
+% \noindent\textbf{Active Mapping/SLAM.} In the interest of exploring the environment by planning the path of mobile robots, active SLAM combines SLAM with path planning. This improves and speeds up the SLAM algorithm's ability to produce high-precision maps. The three active vision issues (localization, mapping, and planning) are combined by active SLAM. Robots can now autonomously carry out localization and mapping tasks, which helps to improve the accuracy of both those tasks and the representation of the environment. This topic has been studied before \cite{1017615} came up with the phrase "Active SLAM," mostly as known as "exploration problems" \cite{stachniss2004exploration,moody1992active}. 
+
+% Specifically, iRotate\cite{bonetto2022irotate} offers an active visual SLAM approach for omnidirectional robots because the static camera restricts the freedom of visual information acquisition. During the path execution, the robot can actively and continuously control its camera heading to maximize the environment coverage by taking advantage of its omnidirectional nature. The robot can significantly speed up the information-gathering process and quickly reduce the level of map uncertainty by actively performing coverage. In particular, these methods need to explicitly build maps before they can work, so they cannot be directly applied to the implicit SLAM framework. At the same time, the memory overhead of building explicit maps is large, and the lack of memory resources of robots often cannot support such active SLAM methods.
+
+\subsection{Online Training}
+% Paper Title: Continual Test-Time Domain Adaptation
+% Paper Title: BNV-Fusion: Dense 3D Reconstruction using Bi-level Neural Volume Fusion
+% Paper Title: Learning Deep SDF Maps Online for Robot Navigation and Exploration
+While machine learning methods heavily rely on labeled training datasets (supervised training), it is costly to label datasets in every possible environment. 
+Especially, real-world robots are running in non-stationary and continually changing environments where the target domain distribution can even change over time.
+As a result, various unsupervised training algorithms are developed to learn knowledge from unlabeled data~\cite{wang2022continual,wilson_survey_2020,ahmed_unsupervised_2021}.
+For example, adversarial unsupervised domain adaptation methods \cite{wang2022continual,9710205,9710300} aim to adapt a source pretrained model to a target domain without using any source
+data. 
+By typically training the pretrained models with both online collected data from the new environment and labels predicted with generative methods, robots can adapt to new environments with higher accuracy of the models. 
+
+Another special category of online training is implicit rendering\cite{li2022bnvfusion,camps2022learning,zhu_nice-slam_2022}, which aims to train an implicit representation of the 3D scene with the supervision of typically a sequence of RGBD images and camera poses.
+They feature the ability of preserving finer textural information, scene completion, real-time reconstruction,etc. 
+% As another example, implicit mapping and positioning \cite{li2022bnvfusion,camps2022learning,zhu2022niceslam} construct a machine learning model representation of a 3D dense map by training the model with online collected unlabeled image sequences. 
+We envision that the prosperity of these unsupervised training algorithms is making online training on online collected data on robots feasible and practical.
+
+\subsection{Active Learning}
+% Paper Title: Deep Batch Active Learning by Diverse, Uncertain Gradient Lower Bounds
+% Paper Title: NeRFusion: Fusing Radiance Fields for Large-Scale Scene Reconstruction
+Active learning \cite{ash2020deep,nguyen2022measure} works in protocol where labels can be requested by the algorithm in a sequential, feedback-driven fashion, which in the field of robotics would be instructing the robot to acquire the corresponding sample. 
+Active learning algorithms aim to identify and label only maximally-informative samples, so that a high-performing AI model can be trained with minimal labeling effort. 
+As such, a robust active learning algorithm for deep neural networks enables the deep learning algorithm to select data for learning in order to gain accurate prediction despite fewer training labels, especially when labeling or gathering new data is costly.
+
+They mainly inspect certain metrics of the training AI model about the unlabeled training data to estimate their information gain.
+For example, \cite{ash2020deep} estimates information gain of an unlabeled training data by computing the gradient intensity and diversity when the training model is back-propagated using pseudo labeling.
+\cite{avidan_activenerf_2022,jin_neu-nbv_2023} model the model output with a Gaussian probability distribution and train an extra model head to predict the divergence of the distribution under a training data as a estimation of uncertainty and thus information gain when the training data is collected for training.
+Nevertheless, they typically rely on a static estimation about the current training model, which fail to model the evolution of the training AI model and result in inefficient acquisition path for the robot along which low quality training data are collected.
+
+
+% \subsection{Active Sampling in Traditional Robotics}
+% % Information-based Active SLAM via topological feature graphs
+% % SMMR-Explore: SubMap-based Multi-Robot Exploration System with Multi-robot Multi-target Potential Field Exploration Method
+% There is also similar research problem in the domain of robotics where robots actively estimates a target representation such as map and navigates to take samples that best improve the quality of the target representation~\cite{lluvia_active_2021,carlone_active_2014}.
+% For example, active simultaneous localization and mapping~\cite{lluvia_active_2021,mu_information-based_2016,xu_invariant_2021} estimates the uncertainty of the robot's localization and mapping via optimization methods such as particle filters, and would navigate the robot to places with low mapping uncertainty to improve localization uncertainty and navigate robot to places with high mapping uncertainty to improve mapping quality.
+% However, such methods are targeted at traditional robotic applications and rely on an explicit target representation (e.g., map in the form of 2D occupancy grid). 
+% Thus they cannot be used in the domain of active acquisition of high quality training data for online training, and they are not considered in this paper.
+
+

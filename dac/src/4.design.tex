@@ -1,0 +1,116 @@
+\section{Design}
+% This section introduces the design of the main components and algorithms of LODA, the Loss Prediction Module and LODA-RPP algorithm in details.
+\subsection{Loss Prediction Module}
+\subsubsection{Loss rendering}
+
+We assume that the sampling environment is limited (e.g., within a room or office) which can be divided into a grid of finite 3D cells ($u_k\in \bm{u}$) and there exists a correspondence relationship that $I_i = Render(\bm{u}, p_i)$ where $p_i$ is the sampling perspective (position and orientation) of $I_i$, and $\bm{u}_i$ is the set of related cells, typically regulated by depth values sensed at $p_i$ and only a fraction of $\bm{u}$ is visible which we refer to as $\bm{u}_i$.
+Thus, 
+$L(\theta_t)$ in Equa.~\ref{mini1} is rewritten as $L(\theta_t) \approx \sum_{i=1}^{m} L'(\theta_t, \bm{u}_i, p_i) < t_{loss}$.
+% \begin{equation}
+%   \begin{aligned}
+%     \mathop{\min} & \quad n,m \\
+%     \mathop{s.t.} & \quad L(\theta_t) \approx \sum_{i=1}^{m} L'(\theta_t, \bm{u}_i, p_i) < t_{loss} \\
+%             & \quad c({I_i}) > t_{coverage}
+%   \end{aligned}
+%   \label{mini2}
+% \end{equation}
+
+While the fast coverage problem is well approximated by traditional RRT algorithms for a limited environment and the number of samples needed to train an AI model is typically much larger than the number of samples needed to cover the environment, thus we may consider the problem based on a set of $\{I_i\}$ that already satisfies the coverage constraint and finding new samples that reduce $\sum_{i=1}^{m} L'(\theta_n, \bm{u}, p_i)$ the most, and we define such diff as:
+\begin{equation}
+  \begin{aligned}
+    D(i+1) &= \sum_{i=1}^{m+1} L'(\theta_t, \bm{u}_i, p_i) - \sum_{i=1}^{m+1} L'(\theta_{t+1}, \bm{u}_i, p_{i}) \\
+    & = \sum_{i=1}^{m} \Delta {L'}^i_t + \Delta {L'}^{m+1}_t
+  \end{aligned}
+\end{equation}
+where $\Delta {L'}^i_t = L'(\theta_t, \bm{u}_i, p_i) - L'(\theta_{t+1}, \bm{u}_i, p_{i})$.
+We assume knowledge from $I_{m+1}$ does not conflict with the previous data, which means it will not increase loss of previous data and $\sum_{i=1}^{m} \Delta {L'}^i_t \geq 0$.
+We have 
+\begin{equation}
+  D(i+1) \geq \Delta {L'}^{m+1}_t
+  \label{delta}
+\end{equation}
+which means the beginning from $\theta_t$ to $\theta_{t+1}$, the training loss reduction over $\bm{u}_{m+1}$ and $p_{m+1}$ reflects the level of information gain can be learned from $I_{m+1}$.
+By now we have associated the variation of training loss bounded to a set of grid cell and its sampling pose with the possible information gain, whose prediction model can be online trained using existing data as shown in the following subsection.
+$p_{m+1}$ (and thus $\bm{u}_{m+1}$) maximizing such loss variation is the training data with highest information gain.
+
+We have approximated the possible information gain of an unknown sample with the difference between the loss rendered to the visible area of a 3D grid of the environment under the regulation of sampling position and orientation and depth values.
+Given a candidate $p_{m+1}$, the parameters to calculate $\Delta {L'}^{m+1}_t$, $\theta_{t+1}$ and the actual sensor input are still unknown, but their resulting loss is of low dimension and can be modelled via online training methods.
+% While the required parameters to calculated $\Delta {L'}^{m+1}_t$ from a specific $p_{m+1}$
+% To predict the training loss variation on the grid cells, 
+In LODA, we use WLG $G$ to represent the environment, which is a four-dimensional sparse grid with the last dimension storing information for loss prediction.
+Specifically, we divide the possible sampling distances and orientations to consider into different levels, $n_{dist}$ and $n_{dir}$.
+When a loss value is rendered to a cell on the grid, we store the number of times that this loss is hit (weight), its average and the latest loss value together with the sampling position and orientation using position encoding.
+
+\subsubsection{Training and inference}
+Given the groundtruth loss $l_u$ of a cell, its sampling distance and orientation$i_{dist}$ and $i_{dir}$ and $G$, a three-layer MLP model $M$ is trained to learn and predict the training loss. The training loss function of $M$ is:
+\begin{equation}
+  L_M = \Vert M(i_{dist}, i_{dir}, G_{j,k,h}) - l_u \Vert_2
+\end{equation}
+which means modelling the dynamics (or varying trend) of loss of a cell based on history information.
+During inference, given a sampling pose $p$, we calculate the visible cells $\bm{u}_p$ and the sampling distance and orientation of each cell. For a cell $u$ on the WLG sampled at $i_{dist}$ and $i_{dir}$, its loss is predicted as $l_u = M(i_{dist}, i_{dir}, u)$.
+Note the inference input and inference result of $\bm{u}_p$ together are of the same form of information needed to render cells for $G$, forming the basis of the recursive path planning in LODA-RPP algorithm.
+
+
+\subsection{LODA-RPP Algorithm}
+In LODA, candidate paths (sequences of sampling poses.) are generated by random sampling algorithms such as RRT. 
+While traditional active learning methods can only consider the information gain of one pose in a path, we manage to calculate the accumulated information gain along the path with LODA-RPP to get a better estimation of overall information gain, and finally find the optimal path with highest accumulated information gain.
+
+\begin{algorithm}[h]
+  \caption{Recursive State Prediction.}
+  \label{alg:rsp}
+  \KwIn{WLG: $G$; Loss Prediction Module with MLP: $M$; candidate path: $P$}
+  \KwOut{predicted future state of World Los Grid when candidate path is executed: $G'$}
+  \BlankLine
+  \uIf{len($P$) = 0}{return $G$} 
+
+  $p$ = $P$[0];
+
+  $\bm{u}_p$, $\bm{i}_{dist}$, $\bm{i}_{dir}$ = FrustumCalculation($p$);
+
+  $l_{\bm{u}_p}$ = $M$($\bm{i}_{dist}$, $\bm{i}_{dir}$, $\bm{u}_p$);
+
+  $G_p'$ = LossRendering($l_{\bm{u}_p}$, $p$, $G$);
+
+  $G_{next}$ = overwrite $G$ with $G_p'$;
+
+  $P_{next}$ = $P$[1:];
+
+  $G'$ = RecursiveStatePrediction($G_{next}$, $M$, $P_{next}$);
+\end{algorithm}
+
+We first introduce the process of Recursive State Prediction as shown in Alg.~\ref{alg:rsp}.
+With the WLG $G$ and MLP model $M$, given desired sampling pose $p$ from a path $P$,
+We first compute the visible cells $\bm{u}_p$ on $G$ and their sampling distances and orientations, with which we can predict their future training loss $l_{\bm{u}_p}$ from $G$.
+We then use the prediction result $l_{\bm{u}_p}$ and sampling pose $p$ to render cells in $\bm{u}_p$ as a partial update of $G$, referred to as $G_p'$, which is the predicted future state of $\bm{u}_p$ in $G$ when the robot navigates to $p$ to acquire new training input.
+Merging $G$ and $G_p'$, we will get the predicted WLG when we have arrived at $p$ and taken samples.
+Recursing such process, we will get the future WLG when every step in $P$ is taken.
+
+\vspace{-0.3cm}
+\begin{algorithm}[h]
+  \caption{Framework of LODA-RPP algorithm}
+  \label{rpp}
+  \KwIn{WLG: $G$; Loss Prediction Module with MLP: $M$; start pose: $p$; planned paths from other robots: $\bm{P}_o$}
+  \KwOut{Planned Path: $P$}
+  \BlankLine
+  \For{$P'$ in $\bm{P}_o$}{$G$ = RecursiveStatePrediction($G$, $M$, $P'$);}
+
+  generate candidate paths $P_{candidate}$;
+
+  $e$ = 0;
+
+  $P$ = [$p$];
+
+  \For{$P'$ in $P_{candidate}$}{
+    $G'$ = RecursiveStatePrediction($G$, $M$, $P'$);
+
+    $e'$ = $G$ - $G'$;
+
+    \uIf{$e'$ > $e$}{$P$ = $P'$}
+  }
+\end{algorithm}
+\vspace{-0.3cm}
+
+Integrating Recursive State Prediction, LODA Recursive Path Planning (LODA-RPP) in Alg.~\ref{rpp} is able to predict the accumulated information gain of each candidate path.
+First, we update the WLG temporarily with the planned paths from other robots using Recursive State Prediction to consider their impact on the path planning of this robot to search for cooperative paths.
+Then for every candidate path, we estimate the accumulated information gain of each path by predicting their resulting WLG when poses in each path are executed with Recursive State Prediction and computing the difference between the starting WLG and resulting WLG.
+Finally the outputted path is the optimal path with highest estimated accumulated information gain which also cooperates with other robots.
